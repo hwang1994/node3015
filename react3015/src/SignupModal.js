@@ -53,10 +53,15 @@ handleSubmit( event ) {
       this.props.action();
       this.close();
     }
+    else {
+      this.props.fail(response.data);
+      this.close();
+    }
   })
   .catch((error) => {
-      this.props.fail(Object.values(error.response.data.errors));
-      this.close();
+    console.log(error);
+    this.props.fail(error);
+    this.close();
   });
 }
 

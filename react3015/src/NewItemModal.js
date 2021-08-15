@@ -62,7 +62,7 @@ handleSubmit( event ) {
       this.close();
     }
     else {
-      this.props.fail('Invalid entries in item fields!');
+      this.props.fail(response.data);
       this.close();
     }
   })

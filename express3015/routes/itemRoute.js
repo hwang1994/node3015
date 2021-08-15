@@ -22,7 +22,7 @@ const upload = multer({ //multer settings
     storage: storage,
     fileFilter: function (req, file, callback) {
         let ext = path.extname(file.originalname);
-        if(ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+        if(ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg' && ext !== '.bmp' && ext !== '.svg' && ext !== '.webp') {
             return callback(new Error('Only images are allowed'))
         }
         callback(null, true)
@@ -35,9 +35,11 @@ const upload = multer({ //multer settings
 module.exports = function(app) {
     app.post("/newitem", isAuthenticated, function(req, res) {
         upload(req, res, function (err) {
+            let errorList = [];
             if (err){
-                console.log(JSON.stringify(err));
-                errorList.push('fail saving image');
+                console.log('error saving file ',JSON.stringify(err));
+                errorList.push('Failed saving image due to invalid file extension');
+                res.json(errorList);
             } 
             else if (req.user) {
                 console.log(req.body);
@@ -47,17 +49,16 @@ module.exports = function(app) {
                     let price = req.body.price;
                     let description = req.body.description;
                     let file = res.req.file.filename;
-                    let errorList = [];
     
                     //validation
                     if (!title || !validator.checkTitle(title.trim())) {
-                        errorList.push('Invalid title');
+                        errorList.push('Invalid title. ');
                     }
                     if (!price || !validator.checkPrice(price.trim())) {
-                        errorList.push('Invalid price');
+                        errorList.push('Invalid price. ');
                     }
                     if (!description || validator.checkDescription(description.trim())) {
-                        errorList.push('Invalid Description');
+                        errorList.push('Invalid Description. ');
                     }
                     if (errorList.length>0) {
                         fs.unlinkSync(req.file.path); // delete the upload
@@ -110,6 +111,20 @@ module.exports = function(app) {
                     [Sequelize.literal('"User"."name"'), 'name']
                 ]
             }).then((items) => {
+                items.sort(function(a, b) {
+                    if (a.name===b.name && a.price===b.price) {
+                        return 0;
+                    }
+                    else if (a.name===b.name && a.price<b.price) {
+                        return 1;
+                    }
+                    else if (a.name===b.name && a.price>b.price) {
+                        return -1;
+                    }
+                    else {
+                        return a.name.localeCompare(b.name);
+                    }
+                });
                 console.log('recently viewed items', items);
                 res.json(items);
             }).catch((err) => {

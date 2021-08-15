@@ -20,19 +20,22 @@ module.exports = function(app) {
         let errorList = [];
 
         //validation
-        if (!firstName || !validator.checkName(firstName.trim())) {
-            errorList.push('Invalid first name');
+        if (firstName=='' || !validator.checkName(firstName.trim())) {
+            errorList.push('Invalid first name. ');
         }
-        if (!lastName || !validator.checkName(lastName.trim())) {
-            errorList.push('Invalid first name');
+        if (lastName=='' || !validator.checkName(lastName.trim())) {
+            errorList.push('Invalid first name. ');
         }
         if (!validator.checkEmail(email)) {
-            errorList.push('Invalid Email');
+            errorList.push('Invalid Email. ');
         }
-        if (!password && password==verifyPassword) {
+        if (password!='' && password==verifyPassword) {
             if (!validator.checkPassword(password)) {
-            errorList.push('Invalid password');
+            errorList.push('Invalid password. ');
             }
+        }
+        else {
+            errorList.push('Invalid password or verify password does not match. ');
         }
         if (errorList.length>0) {
             res.json(errorList);
