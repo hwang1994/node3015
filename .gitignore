@@ -1,5 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 /express3015/node_modules
-/express3015/database/database.sqlite3
+/express3015/database
 /react3015/node_modules
