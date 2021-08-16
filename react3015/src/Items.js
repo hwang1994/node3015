@@ -94,15 +94,16 @@ class Items extends Component {
     promise
       .then((response) => {
         console.log('items response', response.data);
-        if (response.data!==undefined) {
+        if (response.data=='Error getting items!') {
+          this.setState({ 
+            unpinnedItems: [],
+            errorMessage: response.data
+          });
+        }
+        else if (response.data!==undefined) {
           this.setState({ 
             unpinnedItems: response.data,
             errorMessage:null
-          });
-        }
-        else if (response.data=='Error getting items!') {
-          this.setState({ 
-            errorMessage: response.data
           });
         }
         else {
@@ -123,7 +124,13 @@ class Items extends Component {
     promise
       .then((response) => {
         console.log('recently viewed response', response.data);
-        if (response.data!==undefined) {
+        if (response.data=='Error getting recently viewed items!') {
+          this.setState({ 
+            recentlyViewedItems: [],
+            errorMessage: response.data
+          });
+        }
+        else if (response.data!==undefined) {
           this.setState({ 
             recentlyViewedItems: response.data,
             errorMessage:null
@@ -307,14 +314,14 @@ class Items extends Component {
                   return (
                     <Col key={item.id}>
                       <Card border="warning" style={{ width: '24rem' }}>
-                        <Card.Header><Button variant="warning" onClick={ e =>this.unpinItem(item.id)}><i className="fa fa-dot-circle-o"></i></Button>{this.props.email===item.email ? <span className="pull-right text-muted"> <Button variant="danger" onClick={ e =>this.deleteItem(item.item_id)}><i className="fa fa-trash"></i></Button></span>:<span></span>}</Card.Header>
+                        <Card.Header><Button variant="warning" onClick={ e =>this.unpinItem(item.id)}><i className="fa fa-dot-circle-o"></i></Button>{this.props.email===item.email ? <span className="pull-right text-muted"> <Button variant="danger" onClick={ e =>this.deleteItem(item.id)}><i className="fa fa-trash"></i></Button></span>:<span></span>}</Card.Header>
                         <Link to={`/product?id=${item.id}`} >
                           <Card.Img variant="top" src={BASE_URL+PHOTO_STORAGE+item.picture}  />
                         </Link>
                         <Card.Body>
                           <Card.Title>{item.title}</Card.Title>
                           <Card.Text>{item.description}</Card.Text>
-                          { this.props.loggedIn ? <Button variant="primary" onClick={ e =>this.downvoteItem(item.item_id)}><i className="fa fa-thumbs-down"></i></Button>:<span></span>}
+                          { this.props.loggedIn ? <Button variant="primary" onClick={ e =>this.downvoteItem(item.id)}><i className="fa fa-thumbs-down"></i></Button>:<span></span>}
                         </Card.Body>
                         <Card.Footer className="text-muted"><span><a href={`mailto:${item.email}`} data-toggle="tooltip" title="Email seller"><i className="fa fa-envelope"></i>{item.name}</a></span> <span className="pull-right">${(Math.round(item.price * 100) / 100).toFixed(2)}</span></Card.Footer>
                       </Card>

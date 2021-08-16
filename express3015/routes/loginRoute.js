@@ -16,7 +16,7 @@ module.exports = function(app) {
         let lastName = req.body.lastname;
         let email = req.body.email;
         let password = req.body.password;
-        let verifyPassword = req.body.verify_password;
+        let verifyPassword = req.body.password_confirmation;
         let errorList = [];
 
         //validation
@@ -29,13 +29,11 @@ module.exports = function(app) {
         if (!validator.checkEmail(email)) {
             errorList.push('Invalid Email. ');
         }
-        if (password!='' && password==verifyPassword) {
-            if (!validator.checkPassword(password)) {
-            errorList.push('Invalid password. ');
-            }
+        if (password!=verifyPassword) {
+            errorList.push('Verify password does not match entered password. ');
         }
-        else {
-            errorList.push('Invalid password or verify password does not match. ');
+        else if (!validator.checkPassword(password)) {
+            errorList.push('Invalid password. ');
         }
         if (errorList.length>0) {
             res.json(errorList);

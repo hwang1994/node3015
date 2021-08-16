@@ -129,7 +129,7 @@ module.exports = function(app) {
                 res.json(items);
             }).catch((err) => {
                 console.log(err);
-                res.json('Error getting recently items!');
+                res.json('Error getting recently viewed items!');
             }); 
         } 
         else {
