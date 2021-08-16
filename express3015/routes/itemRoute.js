@@ -415,7 +415,7 @@ module.exports = function(app) {
                                                 }
                                                 let itemIds = '';
                                                 for (let i = 0; i < itemIdArray.length; i++) {
-                                                    if (i===itemIdArray.length) {
+                                                    if (i===(itemIdArray.length-1)) {
                                                         itemIds += itemIdArray[i];
                                                     }
                                                     else {
@@ -493,7 +493,7 @@ module.exports = function(app) {
                             }
                             let itemIds = '';
                             for (let i = 0; i < itemIdArray.length; i++) {
-                                if (i===itemIdArray.length) {
+                                if (i===(itemIdArray.length-1)) {
                                     itemIds += itemIdArray[i];
                                 }
                                 else {
