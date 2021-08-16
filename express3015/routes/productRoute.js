@@ -22,8 +22,8 @@ module.exports = function(app) {
                 "price", 
                 "description",
                 "picture",
-                [Sequelize.literal('"User"."email"'), 'email'],
-                [Sequelize.literal('"User"."name"'), 'name']
+                [Sequelize.literal('User.email'), 'email'],
+                [Sequelize.literal('User.name'), 'name']
             ]
         }).then((item) => {
             console.log('THE PRODUCT', item);

@@ -107,8 +107,8 @@ module.exports = function(app) {
                     "price", 
                     "description",
                     "picture",
-                    [Sequelize.literal('"User"."email"'), 'email'],
-                    [Sequelize.literal('"User"."name"'), 'name']
+                    [Sequelize.literal('User.email'), 'email'],
+                    [Sequelize.literal('User.name'), 'name']
                 ]
             }).then((items) => {
                 items.sort(function(a, b) {
@@ -161,8 +161,8 @@ module.exports = function(app) {
                     "price", 
                     "description",
                     "picture",
-                    [Sequelize.literal('"User"."email"'), 'email'],
-                    [Sequelize.literal('"User"."name"'), 'name']
+                    [Sequelize.literal('User.email'), 'email'],
+                    [Sequelize.literal('User.name'), 'name']
                 ]
             }).then((unPinnedItems) => {
                 console.log('user unpinnedItem', unPinnedItems);
@@ -209,8 +209,8 @@ module.exports = function(app) {
                     "price", 
                     "description",
                     "picture",
-                    [Sequelize.literal('"User"."email"'), 'email'],
-                    [Sequelize.literal('"User"."name"'), 'name']
+                    [Sequelize.literal('User.email'), 'email'],
+                    [Sequelize.literal('User.name'), 'name']
                 ]
             }).then((unPinnedItems) => {
                 console.log('guest unpinnedItem', unPinnedItems);
@@ -252,19 +252,21 @@ module.exports = function(app) {
             include: [{
               model: db.Item,
               required: true,
+              attributes: [],
               include: [{
                 model: db.User,
-                required: true
+                required: true,
+                attributes: []
               }]
             }],
             attributes: [
-                [Sequelize.literal('"Item"."id"'), 'id'],
-                [Sequelize.literal('"Item"."title"'), 'title'],
-                [Sequelize.literal('"Item"."price"'), 'price'],
-                [Sequelize.literal('"Item"."description"'), 'description'],
-                [Sequelize.literal('"Item"."picture"'), 'picture'],
-                [Sequelize.literal('"Item->User"."email"'), 'email'],
-                [Sequelize.literal('"Item->User"."name"'), 'name']
+                [Sequelize.literal('Item.id'), 'id'],
+                [Sequelize.literal('Item.title'), 'title'],
+                [Sequelize.literal('Item.price'), 'price'],
+                [Sequelize.literal('Item.description'), 'description'],
+                [Sequelize.literal('Item.picture'), 'picture'],
+                [Sequelize.literal('`Item->User`.email'), 'email'],
+                [Sequelize.literal('`Item->User`.name'), 'name']
             ]
         }).then((pinnedItems) => {
             console.log('pinned items', pinnedItems);

@@ -1,13 +1,29 @@
 version: '3'
 
 services:
+  db:
+    image: mysql:8.0.0
+    container_name: database
+    volumes:
+      - datafiles:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: database_test
 
   backend:
     build:
       context: ./express3015
       dockerfile: Dockerfile
+    depends_on:
+      - db
     ports:
       - "5000:5000"
+    volumes:
+      - /app/node_modules
 
   frontend:
     build:
