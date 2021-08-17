@@ -66,9 +66,8 @@ handleSubmit( event ) {
       this.close();
     }
   })
-  .catch(error => {
-    console.log(error);
-    this.props.fail(error);
+  .catch((error) => {
+    this.props.fail(error.toString());
     this.close();
   });
 }

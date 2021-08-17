@@ -7,6 +7,9 @@ const validator = require('../validation');
 const path = require('path');
 const isAuthenticated = require("../config/middleware/isAuthenticated");
 const fs = require('fs');
+const csrf = require('csurf');
+
+
 
 const storage = multer.diskStorage({ //multers disk storage settings
     destination: function (req, file, cb) {
@@ -32,8 +35,10 @@ const upload = multer({ //multer settings
     }
 }).single('file');
 
+const csrfProtection = csrf({ cookie: true });
+
 module.exports = function(app) {
-    app.post("/newitem", isAuthenticated, function(req, res) {
+    app.post("/newitem", isAuthenticated, csrfProtection, function(req, res) {
         upload(req, res, function (err) {
             let errorList = [];
             if (err){
@@ -294,7 +299,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get("/pin", isAuthenticated, function(req, res) {
+    app.post("/pin", isAuthenticated, csrfProtection, function(req, res) {
         console.log('get id for pinning' + req.query.pin.trim());
         let userId = req.user.id;
         let itemId = req.query.pin.trim();
@@ -327,7 +332,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get("/unpin", isAuthenticated, function(req, res) {
+    app.post("/unpin", isAuthenticated, csrfProtection, function(req, res) {
         console.log('get id for unpinning' + req.query.unpin.trim());
         let userId = req.user.id;
         let itemId = req.query.unpin.trim();
@@ -365,7 +370,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get("/downvote", isAuthenticated, function(req, res) {
+    app.post("/downvote", isAuthenticated, csrfProtection, function(req, res) {
         console.log('get id for downvote' + req.query.downvote.trim());
         let userId = req.user.id;
         let itemId = req.query.downvote.trim();
@@ -459,7 +464,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get("/delete", isAuthenticated, function(req, res) {
+    app.delete("/delete", isAuthenticated, csrfProtection, function(req, res) {
         console.log('get id for delete' + req.query.delete.trim());
         let userId = req.user.id;
         let itemId = req.query.delete.trim();
@@ -533,6 +538,7 @@ module.exports = function(app) {
                 let pictureFiles = [];
                 let itemIdsForDeletion = [];
                 items.forEach(function(item, index, object) {
+                    console.log('created at '+item.createdAt);
                     pictureFiles.push(item.picture);
                     itemIdsForDeletion.push(item.id);
                 });
@@ -586,5 +592,5 @@ module.exports = function(app) {
             console.log(err);
             res.json('Error finding item for expiration');
         });
-    })
+    });
 };

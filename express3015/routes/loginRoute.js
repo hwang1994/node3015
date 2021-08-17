@@ -4,13 +4,16 @@ const bcrypt = require("bcrypt-nodejs");
 const multer  = require('multer');
 const upload = multer();
 const validator = require('../validation');
+const csrf = require('csurf');
+
+const csrfProtection = csrf({ cookie: true });
 
 module.exports = function(app) {
-    app.post("/login", upload.none(), passport.authenticate("local"), function(req, res) {
+    app.post("/login", upload.none(), csrfProtection, passport.authenticate("local"), function(req, res) {
         res.json(["Logged In!"]);
     });
 
-    app.post("/signup", upload.none(), function(req, res) {
+    app.post("/signup", upload.none(), csrfProtection, function(req, res) {
         console.log(req.body);
         let firstName = req.body.firstname;
         let lastName = req.body.lastname;

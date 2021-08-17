@@ -54,7 +54,7 @@ handleSubmit( event ) {
     }
   })
   .catch((error) => {
-    this.props.fail("Email not found or password incorrect");
+    this.props.fail(error.toString());
     this.close();
 });
 }
