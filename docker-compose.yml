@@ -23,7 +23,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - /app/public/pictures
+      - uploadfiles:/app/public/pictures
 
   frontend:
     build:
@@ -34,3 +34,4 @@ services:
     stdin_open: true
 volumes:
   datafiles:
+  uploadfiles:
