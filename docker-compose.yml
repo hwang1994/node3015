@@ -23,7 +23,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - /app/node_modules
+      - /app/public/pictures
 
   frontend:
     build:
