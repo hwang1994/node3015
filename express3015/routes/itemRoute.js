@@ -549,6 +549,7 @@ module.exports = function(app) {
                     let cookie = req.cookies.recentlyViewed;
                     if (cookie !== undefined) {
                         let itemIdArray = cookie.split("|");
+                        let itemIds = '';
                         for (let i = 0; i < itemIdsForDeletion.length; i++) {
                             console.log('does cookie includes delete id? '+itemIdArray.includes(itemIdsForDeletion[i]));
                             if (itemIdArray.includes(itemIdsForDeletion[i])) {
@@ -556,18 +557,20 @@ module.exports = function(app) {
                                     if (itemIdArray[i]===itemIdsForDeletion[i]) {
                                         itemIdArray.splice(i, 1)
                                     }
-                                }
-                                let itemIds = '';
-                                for (let i = 0; i < itemIdArray.length; i++) {
-                                    if (i===(itemIdArray.length-1)) {
-                                        itemIds += itemIdArray[i];
-                                    }
-                                    else {
-                                        itemIds += itemIdArray[i]+'|';
-                                    }
-                                }
-                                res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
+                                }                               
                             }
+                        }
+                        for (let i = 0; i < itemIdArray.length; i++) {
+                            if (i===(itemIdArray.length-1)) {
+                                itemIds += itemIdArray[i];
+                            }
+                            else {
+                                itemIds += itemIdArray[i]+'|';
+                            }
+                        }
+                        console.log('item ids in cookie: '+itemIds);
+                        if (itemIds!=='') {
+                            res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
                         }
                     } 
                     res.json(['Old Items Expired']);
@@ -577,11 +580,11 @@ module.exports = function(app) {
                 });
             }
             else {
-                res.json(['Item does not exist! Delete Failed']);
+                res.json(['Items do not exist! Expire Failed']);
             }
         }).catch(function (err) {
             console.log(err);
             res.json('Error finding item for expiration');
         });
-    });
+    })
 };
