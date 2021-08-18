@@ -9,11 +9,11 @@ const CSRF_TOKEN_URL =`${process.env.REACT_APP_BACK_END_BASE_URL}`+'/csrf';
 
 class App extends Component {
   componentDidMount() {
-    axios.get(CSRF_TOKEN_URL, {withCredentials: true}) // Send get request to get CSRF token once site is visited.
+    axios.get(CSRF_TOKEN_URL, {withCredentials: true})
     .then((response) => {
       //console.log(response.data);
-      axios.defaults.headers.post['X-XSRF-TOKEN'] = response.data; // Set it in header for the rest of the axios requests.
-      axios.defaults.headers.delete['X-XSRF-TOKEN'] = response.data;
+      axios.defaults.headers.post['X-CSRF-TOKEN'] = response.data;
+      axios.defaults.headers.delete['X-CSRF-TOKEN'] = response.data;
     })
   }
   render() {

@@ -4,12 +4,10 @@ const bcrypt = require("bcrypt-nodejs");
 const multer  = require('multer');
 const upload = multer();
 const validator = require('../validation');
-const csrf = require('csurf');
 
-const csrfProtection = csrf({ cookie: true });
-
-module.exports = function(app) {
+module.exports = function(app, csrfProtection) {
     app.post("/login", upload.none(), csrfProtection, passport.authenticate("local"), function(req, res) {
+        console.log(req.headers);
         res.json(["Logged In!"]);
     });
 

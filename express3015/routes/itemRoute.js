@@ -7,9 +7,6 @@ const validator = require('../validation');
 const path = require('path');
 const isAuthenticated = require("../config/middleware/isAuthenticated");
 const fs = require('fs');
-const csrf = require('csurf');
-
-
 
 const storage = multer.diskStorage({ //multers disk storage settings
     destination: function (req, file, cb) {
@@ -35,9 +32,7 @@ const upload = multer({ //multer settings
     }
 }).single('file');
 
-const csrfProtection = csrf({ cookie: true });
-
-module.exports = function(app) {
+module.exports = function(app, csrfProtection) {
     app.post("/newitem", isAuthenticated, csrfProtection, function(req, res) {
         upload(req, res, function (err) {
             let errorList = [];

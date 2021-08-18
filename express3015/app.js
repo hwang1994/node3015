@@ -13,6 +13,7 @@ var usersRouter = require('./routes/users');
 
 var cors = require('cors');
 var csrf = require('csurf');
+var csrfProtection = csrf({ cookie: true });
 
 var app = express();
 
@@ -32,18 +33,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(csrf({ cookie: true }))
+//app.use(csrf({ cookie: true }))
 
 app.use(session({ secret: "keyboard cat", resave: true, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/csrf', function (req, res) {
+app.get('/csrf', csrfProtection, function (req, res) {
   res.json(req.csrfToken());
 })
 require('./associations.js')(app);
-require("./routes/loginRoute.js")(app);
-require("./routes/itemRoute.js")(app);
+require("./routes/loginRoute.js")(app, csrfProtection);
+require("./routes/itemRoute.js")(app, csrfProtection);
 require("./routes/productRoute.js")(app);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
