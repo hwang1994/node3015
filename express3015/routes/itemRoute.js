@@ -327,8 +327,8 @@ module.exports = function(app, csrfProtection) {
         });
     });
 
-    app.post("/unpin", isAuthenticated, csrfProtection, function(req, res) {
-        console.log('get id for unpinning' + req.query.unpin.trim());
+    app.delete("/pin", isAuthenticated, csrfProtection, function(req, res) {
+        console.log('id for unpinning' + req.query.unpin.trim());
         let userId = req.user.id;
         let itemId = req.query.unpin.trim();
         db.Pin.findOne({
@@ -460,7 +460,7 @@ module.exports = function(app, csrfProtection) {
     });
 
     app.delete("/delete", isAuthenticated, csrfProtection, function(req, res) {
-        console.log('get id for delete' + req.query.delete.trim());
+        console.log('id for deletetion ' + req.query.delete.trim());
         let userId = req.user.id;
         let itemId = req.query.delete.trim();
         db.Item.findOne({

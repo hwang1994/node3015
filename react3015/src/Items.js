@@ -220,8 +220,8 @@ class Items extends Component {
 
   unpinItem(id) {
     axios({
-      method: 'post',
-      url: BASE_URL+'/unpin?unpin='+id,
+      method: 'delete',
+      url: BASE_URL+'/pin?unpin='+id,
       withCredentials: true,
       config: { headers: { crossDomain: true} }
     })
