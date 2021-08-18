@@ -547,33 +547,33 @@ module.exports = function(app, csrfProtection) {
                     for (let i = 0; i < pictureFiles.length; i++) {
                         fs.unlinkSync('public/pictures/'+pictureFiles[i]);
                     }
-                    let cookie = req.cookies.recentlyViewed;
-                    if (cookie !== undefined) {
-                        let itemIdArray = cookie.split("|");
-                        let itemIds = '';
-                        for (let i = 0; i < itemIdsForDeletion.length; i++) {
-                            console.log('does cookie includes delete id? '+itemIdArray.includes(itemIdsForDeletion[i]));
-                            if (itemIdArray.includes(itemIdsForDeletion[i])) {
-                                for (let i = 0; i < itemIdArray.length; i++) {
-                                    if (itemIdArray[i]===itemIdsForDeletion[i]) {
-                                        itemIdArray.splice(i, 1)
-                                    }
-                                }                               
-                            }
-                        }
-                        for (let i = 0; i < itemIdArray.length; i++) {
-                            if (i===(itemIdArray.length-1)) {
-                                itemIds += itemIdArray[i];
-                            }
-                            else {
-                                itemIds += itemIdArray[i]+'|';
-                            }
-                        }
-                        console.log('item ids in cookie: '+itemIds);
-                        if (itemIds!=='') {
-                            res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
-                        }
-                    } 
+                    // let cookie = req.cookies.recentlyViewed;
+                    // if (cookie !== undefined) {
+                    //     let itemIdArray = cookie.split("|");
+                    //     let itemIds = '';
+                    //     for (let i = 0; i < itemIdsForDeletion.length; i++) {
+                    //         console.log('does cookie includes delete id? '+itemIdArray.includes(itemIdsForDeletion[i]));
+                    //         if (itemIdArray.includes(itemIdsForDeletion[i])) {
+                    //             for (let i = 0; i < itemIdArray.length; i++) {
+                    //                 if (itemIdArray[i]===itemIdsForDeletion[i]) {
+                    //                     itemIdArray.splice(i, 1)
+                    //                 }
+                    //             }                               
+                    //         }
+                    //     }
+                    //     for (let i = 0; i < itemIdArray.length; i++) {
+                    //         if (i===(itemIdArray.length-1)) {
+                    //             itemIds += itemIdArray[i];
+                    //         }
+                    //         else {
+                    //             itemIds += itemIdArray[i]+'|';
+                    //         }
+                    //     }
+                    //     console.log('item ids in cookie: '+itemIds);
+                    //     if (itemIds!=='') {
+                    //         res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
+                    //     }
+                    // } 
                     res.json(['Old Items Expired']);
                 }).catch(function(err) {
                     console.log(err);
