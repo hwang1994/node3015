@@ -72,7 +72,7 @@ module.exports = function(app, csrfProtection) {
                             description: description.trim(),
                             picture: file
                         }).then(function() {
-                            res.json(['Item Uploaded']);
+                            res.json('Item Uploaded');
                         }).catch(function(err) {
                             console.log(err);
                             res.json(err);
@@ -312,14 +312,14 @@ module.exports = function(app, csrfProtection) {
                     user_id: userId,
                     item_id: itemId
                 }).then(function() {
-                    res.json(['Item Pinned']);
+                    res.json('Item Pinned');
                 }).catch(function(err) {
                     console.log(err);
                     res.json(err);
                 });
             }
             else {
-                res.json(['Item already pinned by user']);
+                res.json('Item already pinned by user');
             }
         }).catch(function (err) {
             console.log(err);
@@ -350,14 +350,14 @@ module.exports = function(app, csrfProtection) {
                         ]
                     }
                 }).then(function() {
-                    res.json(['Item unPinned']);
+                    res.json('Item unPinned');
                 }).catch(function(err) {
                     console.log(err);
                     res.json(err);
                 });
             }
             else {
-                res.json(['Pinned Item does not exist! unpin Failed']);
+                res.json('Pinned Item does not exist! unpin Failed');
             }
         }).catch(function (err) {
             console.log(err);
@@ -427,14 +427,14 @@ module.exports = function(app, csrfProtection) {
                                                 res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
                                             }
                                         }
-                                        res.json(['Downvoted! Now Deleted to due too many downvotes']);
+                                        res.json('Downvoted! Now Deleted to due too many downvotes');
                                     }).catch(function(err) {
                                         console.log(err);
                                         res.json(err);
                                     });
                                 }
                                 else {
-                                    res.json(['Item does not exist! Delete Failed']);
+                                    res.json('Item does not exist! Delete Failed');
                                 }
                             }).catch(function (err) {
                                 console.log(err);
@@ -451,7 +451,7 @@ module.exports = function(app, csrfProtection) {
                 });
             }
             else {
-                res.json(['No downvoting more than once on same product!']);
+                res.json('No downvoting more than once on same product!');
             }
         }).catch(function (err) {
             console.log(err);
@@ -505,14 +505,14 @@ module.exports = function(app, csrfProtection) {
                             res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
                         }
                     } 
-                    res.json(['Item deleted!']);
+                    res.json('Item deleted!');
                 }).catch(function(err) {
                     console.log(err);
                     res.json(err);
                 });
             }
             else {
-                res.json(['Item does not exist! Delete Failed']);
+                res.json('Item does not exist! Delete Failed');
             }
         }).catch(function (err) {
             console.log(err);
@@ -574,14 +574,14 @@ module.exports = function(app, csrfProtection) {
                     //         res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
                     //     }
                     // } 
-                    res.json(['Old Items Expired']);
+                    res.json('Old Items Expired');
                 }).catch(function(err) {
                     console.log(err);
                     res.json(err);
                 });
             }
             else {
-                res.json(['Items do not exist! Expire Failed']);
+                res.json('Items do not exist! Expire Failed');
             }
         }).catch(function (err) {
             console.log(err);
