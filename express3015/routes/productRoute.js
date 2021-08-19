@@ -53,7 +53,7 @@ module.exports = function(app) {
                 res.json(item);
             }
             else {
-                res.json(['Product does not exist!']);
+                res.json('Product does not exist!');
             }
         }).catch(function (err) {
             console.log(err);

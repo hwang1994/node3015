@@ -8,7 +8,7 @@ const validator = require('../validation');
 module.exports = function(app, csrfProtection) {
     app.post("/login", upload.none(), csrfProtection, passport.authenticate("local"), function(req, res) {
         console.log(req.headers);
-        res.json(["Logged In!"]);
+        res.json("Logged In!");
     });
 
     app.post("/signup", upload.none(), csrfProtection, function(req, res) {
@@ -46,7 +46,7 @@ module.exports = function(app, csrfProtection) {
                 password: bcrypt.hashSync(password)
             }).then(function() {
                 passport.authenticate('local')(req, res, function () {
-                    res.json(['Signed Up!']);
+                    res.json('Signed Up!');
                 })
             }).catch(function(err) {
                 console.log(err);
@@ -62,7 +62,7 @@ module.exports = function(app, csrfProtection) {
 
     app.get("/islogin", function(req, res) {
         if (!req.user) {
-            res.json(['Not logged in']);
+            res.json('Not logged in');
         }
         else {
             res.json({
