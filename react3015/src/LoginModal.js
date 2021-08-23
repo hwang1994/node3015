@@ -54,7 +54,7 @@ handleSubmit( event ) {
     }
   })
   .catch((error) => {
-    this.props.fail(error.toString());
+    this.props.fail('Invalid Login! '+error.toString());
     this.close();
 });
 }

@@ -53,6 +53,11 @@ handleSubmit( event ) {
       this.props.action();
       this.close();
     }
+    else if (response.data.errors) {
+      console.log(response.data.errors[0].message);
+      this.props.fail(response.data.errors[0].message);
+      this.close();
+    }
     else {
       this.props.fail(response.data);
       this.close();
