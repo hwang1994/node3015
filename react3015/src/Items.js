@@ -100,7 +100,7 @@ class Items extends Component {
             errorMessage: response.data
           });
         }
-        else if (response.data!==undefined) {
+        else if (Array.isArray(response.data)) {
           this.setState({ 
             unpinnedItems: response.data,
             errorMessage:null
@@ -130,7 +130,7 @@ class Items extends Component {
             errorMessage: response.data
           });
         }
-        else if (response.data!==undefined) {
+        else if (Array.isArray(response.data)) {
           this.setState({ 
             recentlyViewedItems: response.data,
             errorMessage:null
@@ -259,8 +259,8 @@ class Items extends Component {
       if (response.data=='Downvoted!') {
         this.props.action();
       }
-      else if (response.data=='Downvoted! Now Deleted to due too many downvotes') {
-        alert(response.data);
+      else if (response.data=='Item deleted!') {
+        alert('Downvoted! Now Deleted to due too many downvotes');
         this.componentDidMount();
       }
       else if (response.data=='No downvoting more than once on same product!') {
@@ -269,7 +269,7 @@ class Items extends Component {
     })
     .catch((error) => {
       this.props.fail(error.toString());
-  });
+    });
   }
 
   render() {

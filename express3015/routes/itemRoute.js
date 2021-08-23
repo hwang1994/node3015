@@ -32,6 +32,42 @@ const upload = multer({ //multer settings
     }
 }).single('file');
 
+function deleteItem(itemId, pictureFile, req, res) {
+    db.Item.destroy({
+        where: {
+            id: itemId
+        }
+    }).then(function() {
+        fs.unlinkSync('public/pictures/'+pictureFile);
+        let cookie = req.cookies.recentlyViewed;
+        if (cookie !== undefined) {
+            let itemIdArray = cookie.split("|");
+            console.log('does cookie includes delete id? '+itemIdArray.includes(itemId));
+            if (itemIdArray.includes(itemId)) {
+                for (let i = 0; i < itemIdArray.length; i++) {
+                    if (itemIdArray[i]===itemId) {
+                        itemIdArray.splice(i, 1)
+                    }
+                }
+                let itemIds = '';
+                for (let i = 0; i < itemIdArray.length; i++) {
+                    if (i===(itemIdArray.length-1)) {
+                        itemIds += itemIdArray[i];
+                    }
+                    else {
+                        itemIds += itemIdArray[i]+'|';
+                    }
+                }
+                res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
+            }
+        } 
+        res.json('Item deleted!');
+    }).catch(function(err) {
+        console.log(err);
+        res.json(err);
+    });
+}
+
 module.exports = function(app, csrfProtection) {
     app.post("/newitem", isAuthenticated, csrfProtection, function(req, res) {
         upload(req, res, function (err) {
@@ -139,125 +175,93 @@ module.exports = function(app, csrfProtection) {
 
     app.get("/unpinned", function(req, res) {
         console.log('get term query parameter ' + req.query.term.trim());
-        if (req.user) {
-            let userId = req.user.id;
-            db.Item.findAll({
-                where: {
-                    [Op.and]: [
-                      Sequelize.literal("(NOT EXISTS (SELECT * FROM Pins WHERE user_id="+userId+" AND item_id=`Item`.`id`))"),
-                      //{ createdAt: {[Op.between]: [Date.now() - (60 * 60 * 1000), Date.now()]} }
-                    ]
-                },
-                raw : true,
-                include: [{
-                    model: db.User,
-                    required: true,
-                    attributes: []
-                }],
-                attributes: [
-                    "id",
-                    "user_id", 
-                    "title", 
-                    "price", 
-                    "description",
-                    "picture",
-                    [Sequelize.literal('User.email'), 'email'],
-                    [Sequelize.literal('User.name'), 'name']
+        let searchTermStatement;
+        if (req.query.term && req.query.term.trim()!=='' && !validator.checkTerm(req.query.term.trim())) {
+            searchTermStatement = {
+                [Op.or]: [
+                    Sequelize.where(Sequelize.fn('lower', Sequelize.col('title')), { [Op.substring]: req.query.term.toLowerCase().trim() }),
+                    Sequelize.where(Sequelize.fn('lower', Sequelize.col('price')), { [Op.substring]: req.query.term.toLowerCase().trim() }),
+                    Sequelize.where(Sequelize.fn('lower', Sequelize.col('description')), { [Op.substring]: req.query.term.toLowerCase().trim() }), 
+                    Sequelize.where(Sequelize.fn('lower', Sequelize.col('name')), { [Op.substring]: req.query.term.toLowerCase().trim() }),
                 ]
-            }).then((unPinnedItems) => {
-                console.log('user unpinnedItem', unPinnedItems);
-                if (req.query.term && req.query.term.trim()!=='' && !validator.checkTerm(req.query.term.trim())) {
-                    let filteredUnpinnedItems = [];
-                    let term = req.query.term.toLowerCase().trim();
-                    unPinnedItems.forEach(function(item, index, object) {
-                        console.log(item.title.toLowerCase().includes(term));
-                        console.log(item.price.toString().includes(term));
-                        console.log(item.description.toLowerCase().includes(term));
-                        console.log(item.name.toLowerCase().includes(term));
-                        if (item.title.toLowerCase().includes(term) || item.price.toString().includes(term) || item.description.toLowerCase().includes(term) || item.name.toLowerCase().includes(term)) {
-                            console.log('added item', item);
-                            filteredUnpinnedItems.push(item);
-                        }
-                    });
-                    res.json(filteredUnpinnedItems);
-                }
-                else {
-                    res.json(unPinnedItems);
-                }
-            }).catch((err) => {
-                console.log(err);
-                res.json('Error getting items!');
-            });       
+            }
+        }
+        let whereStatement;
+        if (req.user) {
+            whereStatement = {
+                [Op.and]: [
+                    Sequelize.literal("(NOT EXISTS (SELECT * FROM Pins WHERE user_id="+req.user.id+" AND item_id=`Item`.`id`))"),
+                    //{ createdAt: {[Op.between]: [Date.now() - (60 * 60 * 1000), Date.now()]} },
+                    searchTermStatement
+                ]
+            }
         }
         else {
-            db.Item.findAll({
-                where: {
-                //     createdAt: {
-                //         [Op.between]: [Date.now() - (60 * 60 * 1000), Date.now()]
-                //     }
-                },
-                raw : true,
-                include: [{
-                    model: db.User,
-                    required: true,
-                    attributes: []
-                }],
-                attributes: [
-                    "id",
-                    "user_id", 
-                    "title", 
-                    "price", 
-                    "description",
-                    "picture",
-                    [Sequelize.literal('User.email'), 'email'],
-                    [Sequelize.literal('User.name'), 'name']
+            whereStatement = {
+                [Op.and]: [                 
+                    //{ createdAt: {[Op.between]: [Date.now() - (60 * 60 * 1000), Date.now()]} },
+                    searchTermStatement
                 ]
-            }).then((unPinnedItems) => {
-                console.log('guest unpinnedItem', unPinnedItems);
-                if (req.query.term && req.query.term.trim()!=='' && !validator.checkTerm(req.query.term.trim())) {
-                    let filteredUnpinnedItems = [];
-                    let term = req.query.term.toLowerCase().trim();
-                    unPinnedItems.forEach(function(item, index, object) {
-                        console.log(item.title.toLowerCase().includes(term));
-                        console.log(item.price.toString().includes(term));
-                        console.log(item.description.toLowerCase().includes(term));
-                        console.log(item.name.toLowerCase().includes(term));
-                        if (item.title.toLowerCase().includes(term) || item.price.toString().includes(term) || item.description.toLowerCase().includes(term) || item.name.toLowerCase().includes(term)) {
-                            console.log('added item', item);
-                            filteredUnpinnedItems.push(item);
-                        }
-                    });
-                    res.json(filteredUnpinnedItems);
-                }
-                else {
-                    res.json(unPinnedItems);
-                }
-            }).catch((err) => {
-                console.log(err);
-                res.json('Error getting items!');
-            });
+            }
         }
+        db.Item.findAll({
+            where: whereStatement,
+            raw : true,
+            include: [{
+                model: db.User,
+                required: true,
+                attributes: []
+            }],
+            attributes: [
+                "id",
+                "user_id", 
+                "title", 
+                "price", 
+                "description",
+                "picture",
+                [Sequelize.literal('User.email'), 'email'],
+                [Sequelize.literal('User.name'), 'name']
+            ]
+        }).then((unPinnedItems) => {
+            console.log('user unpinnedItem', unPinnedItems);
+            res.json(unPinnedItems);
+        }).catch((err) => {
+            console.log(err);
+            res.json('Error getting items!');
+        });
     });
 
     app.get("/pinned", isAuthenticated, function(req, res) {
         console.log('get term query parameter for pinned' + req.query.term.trim());
+        let searchTermStatement;
+        if (req.query.term && req.query.term.trim()!=='' && !validator.checkTerm(req.query.term.trim())) {
+            searchTermStatement = {
+                [Op.or]: [
+                    Sequelize.where(Sequelize.fn('lower', Sequelize.col('title')), { [Op.substring]: req.query.term.toLowerCase().trim() }),
+                    Sequelize.where(Sequelize.fn('lower', Sequelize.col('price')), { [Op.substring]: req.query.term.toLowerCase().trim() }),
+                    Sequelize.where(Sequelize.fn('lower', Sequelize.col('description')), { [Op.substring]: req.query.term.toLowerCase().trim() }), 
+                    Sequelize.where(Sequelize.fn('lower', Sequelize.col('name')), { [Op.substring]: req.query.term.toLowerCase().trim() }),
+                ]
+            }
+        }
         db.Pin.findAll({
             where: {
                 [Op.and]: [
-                    { user_id: req.user.id },
-                    //{ createdAt: {[Op.between]: [Date.now() - (60 * 60 * 1000), Date.now()]} }
+                    { user_id: req.user.id },                    
+                    //{ createdAt: {[Op.between]: [Date.now() - (60 * 60 * 1000), Date.now()]} },
+                    searchTermStatement
                 ]
             },
             raw : true,
             include: [{
-              model: db.Item,
-              required: true,
-              attributes: [],
-              include: [{
+                model: db.Item,
+                required: true,
+                attributes: [],
+                include: [{
                 model: db.User,
                 required: true,
                 attributes: []
-              }]
+                }]
             }],
             attributes: [
                 [Sequelize.literal('Item.id'), 'id'],
@@ -270,24 +274,7 @@ module.exports = function(app, csrfProtection) {
             ]
         }).then((pinnedItems) => {
             console.log('pinned items', pinnedItems);
-            if (req.query.term && req.query.term.trim()!=='' && !validator.checkTerm(req.query.term.trim())) {
-                let filteredItems = [];
-                let term = req.query.term.toLowerCase().trim();
-                pinnedItems.forEach(function(item, index, object) {
-                    console.log(item.title.toLowerCase().includes(term));
-                    console.log(item.price.toString().includes(term));
-                    console.log(item.description.toLowerCase().includes(term));
-                    console.log(item.name.toLowerCase().includes(term));
-                    if (item.title.toLowerCase().includes(term) || item.price.toString().includes(term) || item.description.toLowerCase().includes(term) || item.name.toLowerCase().includes(term)) {
-                        console.log('added item', item);
-                        filteredItems.push(item);
-                    }
-                });
-                res.json(filteredItems);
-            }
-            else {
-                res.json(pinnedItems);
-            }
+            res.json(pinnedItems);
         }).catch(function (err) {
             console.log(err);
             res.json('Error getting items!');
@@ -390,48 +377,13 @@ module.exports = function(app, csrfProtection) {
                         if (count>=4) {
                             db.Item.findOne({
                                 where: {
-                                    [Op.and]: [
-                                        { user_id: userId },
-                                        { id: itemId }
-                                    ]
+                                    id: itemId
                                 }
                             }).then((item) => {
                                 console.log('THE ITEM FOR DELETION', item);
                                 let pictureFile = item.picture;
                                 if (item!==null) {
-                                    db.Item.destroy({
-                                        where: {
-                                            id: itemId
-                                        }
-                                    }).then(function() {
-                                        fs.unlinkSync('public/pictures/'+pictureFile);
-                                        let cookie = req.cookies.recentlyViewed;
-                                        if (cookie !== undefined) {
-                                            let itemIdArray = cookie.split("|");
-                                            console.log('does cookie includes delete id? '+itemIdArray.includes(itemId));
-                                            if (itemIdArray.includes(itemId)) {
-                                                for (let i = 0; i < itemIdArray.length; i++) {
-                                                    if (itemIdArray[i]===itemId) {
-                                                        itemIdArray.splice(i, 1)
-                                                    }
-                                                }
-                                                let itemIds = '';
-                                                for (let i = 0; i < itemIdArray.length; i++) {
-                                                    if (i===(itemIdArray.length-1)) {
-                                                        itemIds += itemIdArray[i];
-                                                    }
-                                                    else {
-                                                        itemIds += itemIdArray[i]+'|';
-                                                    }
-                                                }
-                                                res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
-                                            }
-                                        }
-                                        res.json('Downvoted! Now Deleted to due too many downvotes');
-                                    }).catch(function(err) {
-                                        console.log(err);
-                                        res.json(err);
-                                    });
+                                    deleteItem(itemId, pictureFile, req, res);
                                 }
                                 else {
                                     res.json('Item does not exist! Delete Failed');
@@ -442,7 +394,7 @@ module.exports = function(app, csrfProtection) {
                             });
                         }
                         else {
-                            res.json(['Downvoted!']);
+                            res.json('Downvoted!');
                         }
                     })
                 }).catch(function(err) {
@@ -474,42 +426,7 @@ module.exports = function(app, csrfProtection) {
             console.log('THE ITEM FOR DELETION', item);
             let pictureFile = item.picture;
             if (item!==null && item.user_id===userId) {
-                db.Item.destroy({
-                    where: {
-                        [Op.and]: [
-                            { user_id: userId },
-                            { id: itemId }
-                        ]
-                    }
-                }).then(function() {
-                    fs.unlinkSync('public/pictures/'+pictureFile);
-                    let cookie = req.cookies.recentlyViewed;
-                    if (cookie !== undefined) {
-                        let itemIdArray = cookie.split("|");
-                        console.log('does cookie includes delete id? '+itemIdArray.includes(itemId));
-                        if (itemIdArray.includes(itemId)) {
-                            for (let i = 0; i < itemIdArray.length; i++) {
-                                if (itemIdArray[i]===itemId) {
-                                    itemIdArray.splice(i, 1)
-                                }
-                            }
-                            let itemIds = '';
-                            for (let i = 0; i < itemIdArray.length; i++) {
-                                if (i===(itemIdArray.length-1)) {
-                                    itemIds += itemIdArray[i];
-                                }
-                                else {
-                                    itemIds += itemIdArray[i]+'|';
-                                }
-                            }
-                            res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
-                        }
-                    } 
-                    res.json('Item deleted!');
-                }).catch(function(err) {
-                    console.log(err);
-                    res.json(err);
-                });
+                deleteItem(itemId, pictureFile, req, res);
             }
             else {
                 res.json('Item does not exist! Delete Failed');
