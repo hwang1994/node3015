@@ -11,7 +11,7 @@ exports.checkName = function(name) {
 }
 
 exports.checkPassword = function(password) {
-    return /((?=.*[a-z])(?=.*[0-9])(?=.*[!?|@])){8,15}/.test(password);
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/.test(password);
 }
 
 exports.checkTitle = function(title) {
