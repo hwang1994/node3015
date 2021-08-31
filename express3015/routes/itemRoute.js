@@ -366,40 +366,39 @@ module.exports = function(app, csrfProtection) {
         }).then((downVotedItem) => {
             console.log('THE DOWNVOTED ITEM', downVotedItem);
             if (downVotedItem===null) {
-                db.Downvote.create({
-                    user_id: userId,
-                    item_id: itemId
-                }).then(function() {
-                    db.Downvote.count ({
-                        where : { item_id: req.query.downvote.trim()}
-                    }).then((count)=> {
-                        console.log('the number of times the item has been downvoted: '+count);
-                        if (count>=4) {
-                            db.Item.findOne({
-                                where: {
-                                    id: itemId
-                                }
-                            }).then((item) => {
-                                console.log('THE ITEM FOR DELETION', item);
-                                let pictureFile = item.picture;
-                                if (item!==null) {
-                                    deleteItem(itemId, pictureFile, req, res);
-                                }
-                                else {
-                                    res.json('Item does not exist! Delete Failed');
-                                }
-                            }).catch(function (err) {
-                                console.log(err);
-                                res.json('Error finding item for deletion');
-                            });
-                        }
-                        else {
+                db.Downvote.count ({
+                    where : { item_id: req.query.downvote.trim()}
+                }).then((count)=> {
+                    if (count>=4) {
+                        db.Item.findOne({
+                            where: {
+                                id: itemId
+                            }
+                        }).then((item) => {
+                            console.log('THE ITEM FOR DELETION', item);
+                            let pictureFile = item.picture;
+                            if (item!==null) {
+                                deleteItem(itemId, pictureFile, req, res);
+                            }
+                            else {
+                                res.json('Item does not exist! Delete Failed');
+                            }
+                        }).catch(function (err) {
+                            console.log(err);
+                            res.json('Error finding item for deletion');
+                        });
+                    }
+                    else {
+                        db.Downvote.create({
+                            user_id: userId,
+                            item_id: itemId
+                        }).then(function() {
                             res.json('Downvoted!');
-                        }
-                    })
-                }).catch(function(err) {
-                    console.log(err);
-                    res.json(err);
+                        }).catch(function(err) {
+                            console.log(err);
+                            res.json(err);
+                        });
+                    }
                 });
             }
             else {
@@ -411,7 +410,7 @@ module.exports = function(app, csrfProtection) {
         });
     });
 
-    app.delete("/delete", isAuthenticated, csrfProtection, function(req, res) {
+    app.delete("/item", isAuthenticated, csrfProtection, function(req, res) {
         console.log('id for deletetion ' + req.query.delete.trim());
         let userId = req.user.id;
         let itemId = req.query.delete.trim();
@@ -429,7 +428,7 @@ module.exports = function(app, csrfProtection) {
                 deleteItem(itemId, pictureFile, req, res);
             }
             else {
-                res.json('Item does not exist! Delete Failed');
+                res.json('Item does not exist or invalid deletion! Delete Failed');
             }
         }).catch(function (err) {
             console.log(err);
@@ -464,33 +463,6 @@ module.exports = function(app, csrfProtection) {
                     for (let i = 0; i < pictureFiles.length; i++) {
                         fs.unlinkSync('public/pictures/'+pictureFiles[i]);
                     }
-                    // let cookie = req.cookies.recentlyViewed;
-                    // if (cookie !== undefined) {
-                    //     let itemIdArray = cookie.split("|");
-                    //     let itemIds = '';
-                    //     for (let i = 0; i < itemIdsForDeletion.length; i++) {
-                    //         console.log('does cookie includes delete id? '+itemIdArray.includes(itemIdsForDeletion[i]));
-                    //         if (itemIdArray.includes(itemIdsForDeletion[i])) {
-                    //             for (let i = 0; i < itemIdArray.length; i++) {
-                    //                 if (itemIdArray[i]===itemIdsForDeletion[i]) {
-                    //                     itemIdArray.splice(i, 1)
-                    //                 }
-                    //             }                               
-                    //         }
-                    //     }
-                    //     for (let i = 0; i < itemIdArray.length; i++) {
-                    //         if (i===(itemIdArray.length-1)) {
-                    //             itemIds += itemIdArray[i];
-                    //         }
-                    //         else {
-                    //             itemIds += itemIdArray[i]+'|';
-                    //         }
-                    //     }
-                    //     console.log('item ids in cookie: '+itemIds);
-                    //     if (itemIds!=='') {
-                    //         res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
-                    //     }
-                    // } 
                     res.json('Old Items Expired');
                 }).catch(function(err) {
                     console.log(err);

@@ -182,7 +182,7 @@ class Items extends Component {
   deleteItem(id) {
     axios({
       method: 'delete',
-      url: BASE_URL+'/delete?delete='+id,
+      url: BASE_URL+'/item?delete='+id,
       withCredentials: true,
       config: { headers: { crossDomain: true} }
     })
