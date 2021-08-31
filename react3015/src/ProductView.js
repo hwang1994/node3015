@@ -39,14 +39,6 @@ class ProductView extends Component {
     //console.log('END ProductViewdidMount');
   }
 
-  componentDidUpdate(prevState) {
-    //console.log('ProductViewComponentDidUpdate');
-  }
-
-  componentWillUnmount() {
-    
-  }
-
   render() {
     if (this.state.selectedProduct.id) {
       return (
