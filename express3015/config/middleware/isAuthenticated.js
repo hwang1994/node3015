@@ -3,6 +3,6 @@ module.exports = function(req, res, next) {
     if (req.user) {
       return next();
     }
-    // If the user isnt' logged in, redirect them to the login page
+
     return res.json("Not Logged In");
 };

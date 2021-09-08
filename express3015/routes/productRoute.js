@@ -3,7 +3,7 @@ const Sequelize = require('sequelize');
 
 module.exports = function(app) {
     app.get("/getitem", function(req, res) {
-        console.log('get id for delete' + req.query.id.trim());
+        console.log('get id for product' + req.query.id.trim());
         let itemId = req.query.id.trim();
         db.Item.findOne({
             where: {
@@ -38,15 +38,16 @@ module.exports = function(app) {
                     let itemIdArray = cookie.split("|");
                     console.log(itemIdArray.includes(itemId));
                     if (!itemIdArray.includes(itemId) && itemIdArray.length<4) {
-                        let itemIds = itemId;
-                        for (let i = 0; i < itemIdArray.length; i++) {
-                            itemIds +='|'+itemIdArray[i];
+                        let newCookieIds = itemIdArray[0];
+                        for (let i = 1; i < itemIdArray.length; i++) {
+                            newCookieIds += '|' + itemIdArray[i];
                         }
-                        res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
+                        newCookieIds += "|" + itemId;
+                        res.cookie('recentlyViewed', newCookieIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
                     }
                     else if (!itemIdArray.includes(itemId) && itemIdArray.length>=4) {
-                        let itemIds = itemId + '|'+ itemIdArray[0]+ '|'+ itemIdArray[1]+ '|'+ itemIdArray[2];
-                        res.cookie('recentlyViewed', itemIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
+                        let newCookieIds = itemIdArray[1]+ '|'+ itemIdArray[2]+ '|'+ itemIdArray[3]+ '|'+ itemId;
+                        res.cookie('recentlyViewed', newCookieIds, { maxAge: 60 * 60 * 1000, httpOnly: true });
                     }
                     console.log('the cookie', cookie);
                 }

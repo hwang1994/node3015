@@ -45,6 +45,8 @@ app.get('/csrf', csrfProtection, function (req, res) {
 require('./associations.js')(app);
 require("./routes/loginRoute.js")(app, csrfProtection);
 require("./routes/itemRoute.js")(app, csrfProtection);
+require("./routes/pinRoute.js")(app, csrfProtection);
+require("./routes/recentlyviewedRoute.js")(app);
 require("./routes/productRoute.js")(app);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

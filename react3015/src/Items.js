@@ -90,7 +90,7 @@ class Items extends Component {
   }
 
   getAllUnpinnedItems() {
-    const promise = axios.get(BASE_URL+'/unpinned?term='+this.state.searchText, {withCredentials: true});
+    const promise = axios.get(BASE_URL+'/items?term='+this.state.searchText, {withCredentials: true});
     promise
       .then((response) => {
         console.log('items response', response.data);
@@ -150,7 +150,7 @@ class Items extends Component {
   }
 
   getAllPinnedItems() {
-    const promise = axios.get(BASE_URL+'/pinned?term='+this.state.searchText, {withCredentials: true});
+    const promise = axios.get(BASE_URL+'/pins?term='+this.state.searchText, {withCredentials: true});
     promise
       .then((response) => {
         console.log('pinned response', response.data);

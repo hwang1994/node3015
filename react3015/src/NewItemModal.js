@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const POST_ITEM_URL = `${process.env.REACT_APP_BACK_END_BASE_URL}`+'/newitem';
+const POST_ITEM_URL = `${process.env.REACT_APP_BACK_END_BASE_URL}`+'/item';
 
 class NewItemModal extends Component {
   constructor(props) {
