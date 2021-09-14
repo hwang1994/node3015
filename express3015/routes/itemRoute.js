@@ -122,7 +122,7 @@ module.exports = function(app, csrfProtection) {
     });
 
     app.get("/items", function(req, res) {
-        console.log('get term query parameter ' + req.query.term.trim());
+        //console.log('get term query parameter ' + req.query.term.trim());
         let searchTermStatement;
         if (req.query.term && req.query.term.trim()!=='' && !validator.checkTerm(req.query.term.trim())) {
             searchTermStatement = {
